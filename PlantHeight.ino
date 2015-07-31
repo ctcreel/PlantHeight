@@ -1,6 +1,6 @@
 #include "DEBUG.h"
 #include "../../Projects/HydroManager/Commands.h"
-#include <SoftwareSerial.h>
+#include "../../Projects/HydroManager/Config.h"
 #include <TextFinder.h>
 #include <Time.h>
 #include <TimeAlarms.h>
@@ -12,10 +12,9 @@
 #define RANGE_FINDER_DATA 53
 #define RANGE_FINDER_POWER 52
 #define ACCEPTABLE_HEIGHT 18
-#define MEASURE_EVERY 
+#define SENSOR_HEIGHT 2
 
 generatorDeviceID gID;
-SoftwareSerial ss(11,10);
 eventStream *e;
 int lastNotified;
 
@@ -27,21 +26,27 @@ void setup() {
   pinMode(RANGE_FINDER_POWER, OUTPUT);
   digitalWrite(RANGE_FINDER_POWER, HIGH);
   lastNotified = 0;
-  ss.begin(BAUD_RATE);
-  e = new eventStream(&ss,&gID);
+  Serial3.begin(BAUD_RATE);
+  e = new eventStream(&Serial3,&gID);
   new eventIncoming(e, setHeight, SET_DISTANCE);
 }
 
 void loop() {
-  e->check();
+  e->check(2);
 }
 
-void setHeight(const unsigned long v) {
-  const float potHeight = 15.0;
-  const float lightHeight = 6.0;
-  const float tentHeight = 70;
-  float height = tentHeight - (((float) pulseIn(RANGE_FINDER_DATA, HIGH)) / 147.0 + (potHeight + lightHeight));
-  DEBUG("Plant is "+String(height) + " high");
+void setHeight(const unsigned long distanceToPlant) {
+  const float potHeight = POT_HEIGHT;
+  const float sensorHeight = SENSOR_HEIGHT;
+  const float lightHeight = LIGHT_HEIGHT;
+  const float tentHeight = TENT_HEIGHT;
+  const float distanceToTop = getDistance();
+  const float height = tentHeight - (potHeight + sensorHeight + lightHeight + distanceToPlant  + distanceToTop);
+  DEBUG("Distance to top is " + String(distanceToTop) + ", Distance to plant is "+String(distanceToPlant)+", Plant is "+String(height) + " high");
   e->createEvent(height, SET_HEIGHT);
+}
+
+const unsigned long getDistance(void) {
+  return (((float) pulseIn(RANGE_FINDER_DATA, HIGH)) / 147.0);
 }
 
