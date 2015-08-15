@@ -8,6 +8,11 @@
 #include "eventHandler.h"
 #include "eventCallBack.h"
 #include "generatorDeviceID.h"
+#include "DHT.h"
+
+#define DHTPIN 2     // what pin we're connected to
+#define DHTTYPE DHT22   // DHT 22  (AM2302)
+DHT dht(DHTPIN, DHTTYPE);
 
 #define RANGE_FINDER_DATA 53
 #define RANGE_FINDER_POWER 52
@@ -29,6 +34,8 @@ void setup() {
   Serial3.begin(BAUD_RATE);
   e = new eventStream(&Serial3,&gID);
   new eventIncoming(e, setHeight, SET_DISTANCE);
+  new eventOutgoing(e, getHumidity, SET_HUMIDITY, GET_HUMIDITY);
+  new eventOutgoing(e, getAirTemp, SET_AIR_TEMP, GET_AIR_TEMP);
 }
 
 void loop() {
@@ -48,5 +55,36 @@ void setHeight(const unsigned long distanceToPlant) {
 
 const unsigned long getDistance(void) {
   return (((float) pulseIn(RANGE_FINDER_DATA, HIGH)) / 147.0);
+}
+
+const unsigned long getHumidity(void) {
+  float h = dht.readHumidity();
+  // Check if any reads failed and exit early (to try again).
+  if (isnan(h)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return 0;
+  }
+
+  Serial.print("Humidity: ");
+  Serial.print(h);
+  
+  return (unsigned long) h;
+}
+
+
+const unsigned long getAirTemp(void) {
+  // Read temperature as Fahrenheit (isFahrenheit = true)
+  float f = dht.readTemperature(true);
+
+  // Check if any reads failed and exit early (to try again).
+  if (isnan(f)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return 0;
+  }
+
+  Serial.print("Temperature: ");
+  Serial.print(f);
+
+  return (unsigned long) f;
 }
 
