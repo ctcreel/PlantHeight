@@ -39,7 +39,15 @@ void setup() {
 }
 
 void loop() {
-  e->check(2);
+  e->check(5);
+  /*
+  Serial.print("Distance ");
+  Serial.println(getDistance());
+  Serial.print("Humidity ");
+  Serial.println(getHumidity());
+  Serial.print("Temp ");
+  Serial.println(getAirTemp());
+  */
 }
 
 void setHeight(const unsigned long distanceToPlant) {
