@@ -31,6 +31,8 @@ void setup() {
   pinMode(RANGE_FINDER_POWER, OUTPUT);
   digitalWrite(RANGE_FINDER_POWER, HIGH);
   lastNotified = 0;
+  // Serial3.begin(BAUD_RATE);
+  // e = new eventStream(&Serial3,&gID);
   Serial3.begin(BAUD_RATE);
   e = new eventStream(&Serial3,&gID);
   new eventIncoming(e, setHeight, SET_DISTANCE);
@@ -40,14 +42,14 @@ void setup() {
 
 void loop() {
   e->check(5);
-  /*
+/*
   Serial.print("Distance ");
   Serial.println(getDistance());
   Serial.print("Humidity ");
   Serial.println(getHumidity());
   Serial.print("Temp ");
   Serial.println(getAirTemp());
-  */
+*/  
 }
 
 void setHeight(const unsigned long distanceToPlant) {
