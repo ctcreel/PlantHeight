@@ -21,18 +21,12 @@ DHT dht(DHTPIN, DHTTYPE);
 
 generatorDeviceID gID;
 eventStream *e;
-int lastNotified;
 
 void setup() {
-
-  //This opens up a serial connection to shoot the results back to the PC console
   Serial.begin(19200);
   pinMode(RANGE_FINDER_DATA, INPUT);
   pinMode(RANGE_FINDER_POWER, OUTPUT);
   digitalWrite(RANGE_FINDER_POWER, HIGH);
-  lastNotified = 0;
-  // Serial3.begin(BAUD_RATE);
-  // e = new eventStream(&Serial3,&gID);
   Serial3.begin(BAUD_RATE);
   e = new eventStream(&Serial3,&gID);
   new eventIncoming(e, setHeight, SET_DISTANCE);
@@ -41,7 +35,7 @@ void setup() {
 }
 
 void loop() {
-  e->check(5);
+  e->check(10);
 /*
   Serial.print("Distance ");
   Serial.println(getDistance());
@@ -60,7 +54,11 @@ void setHeight(const unsigned long distanceToPlant) {
   const float distanceToTop = getDistance();
   const float height = tentHeight - (potHeight + sensorHeight + lightHeight + distanceToPlant  + distanceToTop);
   DEBUG("Distance to top is " + String(distanceToTop) + ", Distance to plant is "+String(distanceToPlant)+", Plant is "+String(height) + " high");
-  e->createEvent(height, SET_HEIGHT);
+  if(height < 0) {
+    e->createEvent((const unsigned long) 0L, SET_HEIGHT);
+  } else {
+    e->createEvent(height, SET_HEIGHT);
+  }
 }
 
 const unsigned long getDistance(void) {
