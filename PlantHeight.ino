@@ -16,8 +16,6 @@ DHT dht(DHTPIN, DHTTYPE);
 
 #define RANGE_FINDER_DATA 53
 #define RANGE_FINDER_POWER 52
-#define ACCEPTABLE_HEIGHT 18
-#define SENSOR_HEIGHT 2
 
 generatorDeviceID gID;
 eventStream *e;
@@ -36,23 +34,22 @@ void setup() {
 
 void loop() {
   e->check(10);
-/*
+
   Serial.print("Distance ");
   Serial.println(getDistance());
   Serial.print("Humidity ");
   Serial.println(getHumidity());
   Serial.print("Temp ");
   Serial.println(getAirTemp());
-*/  
+
 }
 
 void setHeight(const unsigned long distanceToPlant) {
   const float potHeight = POT_HEIGHT;
-  const float sensorHeight = SENSOR_HEIGHT;
   const float lightHeight = LIGHT_HEIGHT;
   const float tentHeight = TENT_HEIGHT;
   const float distanceToTop = getDistance();
-  const float height = tentHeight - (potHeight + sensorHeight + lightHeight + distanceToPlant  + distanceToTop);
+  const float height = tentHeight - (potHeight + lightHeight + distanceToPlant  + distanceToTop);
   DEBUG("Distance to top is " + String(distanceToTop) + ", Distance to plant is "+String(distanceToPlant)+", Plant is "+String(height) + " high");
   if(height < 0) {
     e->createEvent((const unsigned long) 0L, SET_HEIGHT);
@@ -62,9 +59,9 @@ void setHeight(const unsigned long distanceToPlant) {
 }
 
 const unsigned long getDistance(void) {
-  return (((float) pulseIn(RANGE_FINDER_DATA, HIGH)) / 147.0);
+  return (((float) pulseIn(RANGE_FINDER_DATA, HIGH)) / 147.0 + SENSOR_TO_TOP_HEIGHT);
 }
-
+ 
 const unsigned long getHumidity(void) {
   float h = dht.readHumidity();
   // Check if any reads failed and exit early (to try again).
