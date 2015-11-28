@@ -20,13 +20,20 @@ DHT dht(DHTPIN, DHTTYPE);
 generatorDeviceID gID;
 eventStream *e;
 
+
+#include "SoftwareSerial.h"
+SoftwareSerial XBee(11,12); // RX, TX
+
+
 void setup() {
-  Serial.begin(19200);
+  Serial.begin(BAUD_RATE);
+  Serial3.begin(BAUD_RATE);
+  XBee.begin(BAUD_RATE);
   pinMode(RANGE_FINDER_DATA, INPUT);
   pinMode(RANGE_FINDER_POWER, OUTPUT);
   digitalWrite(RANGE_FINDER_POWER, HIGH);
-  Serial3.begin(BAUD_RATE);
-  e = new eventStream(&Serial3,&gID);
+  //e = new eventStream(&Serial3,&gID);
+  e = new eventStream(&XBee,&gID);
   new eventIncoming(e, setHeight, SET_DISTANCE);
   new eventOutgoing(e, getHumidity, SET_HUMIDITY, GET_HUMIDITY);
   new eventOutgoing(e, getAirTemp, SET_AIR_TEMP, GET_AIR_TEMP);
