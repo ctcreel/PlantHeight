@@ -20,11 +20,6 @@ DHT dht(DHTPIN, DHTTYPE);
 generatorDeviceID gID;
 eventStream *e;
 
-
-//#include "SoftwareSerial.h"
-//SoftwareSerial XBee(11,12); // RX, TX
-
-
 void setup() {
   Serial.begin(BAUD_RATE);
   Serial3.begin(BAUD_RATE);
@@ -38,15 +33,7 @@ void setup() {
 }
 
 void loop() {
-  e->check(10);
-
-  Serial.print("Distance ");
-  Serial.println(getDistance());
-  Serial.print("Humidity ");
-  Serial.println(getHumidity());
-  Serial.print("Temp ");
-  Serial.println(getAirTemp());
-
+  e->check(0);
 }
 
 void setHeight(const unsigned long distanceToPlant) {
